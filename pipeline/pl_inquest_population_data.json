@@ -19,6 +19,10 @@
 						"type": "DelimitedTextSource",
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
+							"maxConcurrentConnections": {
+								"value": "@pipeline().parameters.MaxCCName2",
+								"type": "Expression"
+							},
 							"recursive": true,
 							"enablePartitionDiscovery": false
 						},
@@ -61,6 +65,14 @@
 				]
 			}
 		],
+		"parameters": {
+			"MaxCCName": {
+				"type": "String"
+			},
+			"MaxCCName2": {
+				"type": "Float"
+			}
+		},
 		"annotations": [],
 		"lastPublishTime": "2021-08-31T10:27:40Z"
 	},
