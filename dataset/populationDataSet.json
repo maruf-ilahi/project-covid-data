@@ -1,0 +1,33 @@
+{
+	"name": "populationDataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LSDymBlob",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"blobName": "data"
+			}
+		},
+		"parameters": {
+			"dataSetName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "population_by_age.tsv.gz",
+				"container": "data"
+			},
+			"columnDelimiter": "\t",
+			"rowDelimiter": "\n",
+			"compressionCodec": "gzip",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
