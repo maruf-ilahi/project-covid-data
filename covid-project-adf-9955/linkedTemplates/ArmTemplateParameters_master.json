@@ -17,6 +17,9 @@
 		"ls_covid_target_adls_properties_typeProperties_url": {
 			"value": "https://covidadlssa.dfs.core.windows.net"
 		},
+		"tr_population_daily_properties_typeProperties_scope": {
+			"value": "/subscriptions/3dc8e840-08a1-4fe0-8e02-257f176f3db3/resourceGroups/covid-proj-rg/providers/Microsoft.Storage/storageAccounts/covidblobsa"
+		},
 		"containerUri": {
 			"value": ""
 		},
