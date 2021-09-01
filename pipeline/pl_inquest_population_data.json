@@ -5,7 +5,14 @@
 			{
 				"name": "Copy Population Data",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Check If File Exists",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.04:00:00",
 					"retry": 0,
@@ -63,6 +70,20 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Check If File Exists",
+				"type": "Validation",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DsCovidSource",
+						"type": "DatasetReference"
+					},
+					"timeout": "1.00:00:00",
+					"sleep": 10
+				}
 			}
 		],
 		"parameters": {
