@@ -68,7 +68,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@activity('Column Count').output.columnCount",
+						"value": "@lessOrEquals(activity('Column Count').output.columnCount,13)",
 						"type": "Expression"
 					},
 					"ifTrueActivities": [
