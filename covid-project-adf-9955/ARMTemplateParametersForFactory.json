@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "covid-project-adf-9955"
+		},
+		"LSDymBlob_connectionString": {
+			"value": ""
+		},
+		"ls_covid_source_blob_connectionString": {
+			"value": ""
+		},
+		"ls_covid_target_adls_accountKey": {
+			"value": ""
+		},
+		"ls_covid_target_adls_properties_typeProperties_url": {
+			"value": "https://covidadlssa.dfs.core.windows.net"
+		}
+	}
+}
