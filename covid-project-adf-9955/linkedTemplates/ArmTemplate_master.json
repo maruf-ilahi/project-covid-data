@@ -27,6 +27,10 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/3dc8e840-08a1-4fe0-8e02-257f176f3db3/resourceGroups/covid-proj-rg/providers/Microsoft.Storage/storageAccounts/covidblobsa"
 		},
+		"tr_population_by_event_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/3dc8e840-08a1-4fe0-8e02-257f176f3db3/resourceGroups/covid-proj-rg/providers/Microsoft.Storage/storageAccounts/covidblobsa"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -68,6 +72,9 @@
 					},
 					"tr_population_daily_properties_typeProperties_scope": {
 						"value": "[parameters('tr_population_daily_properties_typeProperties_scope')]"
+					},
+					"tr_population_by_event_properties_typeProperties_scope": {
+						"value": "[parameters('tr_population_by_event_properties_typeProperties_scope')]"
 					}
 				}
 			},
