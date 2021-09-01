@@ -554,7 +554,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"expression": {
-								"value": "@activity('Validate Column Count').output.columnCount",
+								"value": "@equals(activity('Validate Column Count').output.columnCount,13)",
 								"type": "Expression"
 							},
 							"ifTrueActivities": [
