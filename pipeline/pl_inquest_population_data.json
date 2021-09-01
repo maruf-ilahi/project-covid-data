@@ -7,7 +7,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Check If File Exists",
+						"activity": "Validate Column Count",
 						"dependencyConditions": [
 							"Succeeded"
 						]

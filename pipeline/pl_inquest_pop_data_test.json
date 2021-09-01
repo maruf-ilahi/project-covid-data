@@ -1,0 +1,7 @@
+{
+	"name": "pl_inquest_pop_data_test",
+	"properties": {
+		"description": "Population data test pipeline",
+		"annotations": []
+	}
+}
