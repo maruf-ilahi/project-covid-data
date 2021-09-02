@@ -719,7 +719,7 @@
 					"recurrence": {
 						"frequency": "Minute",
 						"interval": 1,
-						"startTime": "2021-09-05T10:27:00",
+						"startTime": "2021-09-01T10:29:00",
 						"timeZone": "GMT Standard Time"
 					}
 				}
@@ -747,6 +747,7 @@
 					"frequency": "Minute",
 					"interval": 5,
 					"startTime": "2021-09-02T10:00:00Z",
+					"endTime": "2021-09-02T10:31:00Z",
 					"delay": "00:00:00",
 					"maxConcurrency": 50,
 					"retryPolicy": {
