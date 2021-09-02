@@ -697,6 +697,36 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pl_inquest_population_data')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tr_population_by_schedule')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_inquest_pop_data_test",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 1,
+						"startTime": "2021-09-05T10:18:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_inquest_pop_data_test')]"
+			]
 		}
 	]
 }
