@@ -23,6 +23,10 @@
 			"type": "string",
 			"defaultValue": "https://covidadlssa.dfs.core.windows.net"
 		},
+		"ls_http_ecdc_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://opendata.ecdc.europa.eu"
+		},
 		"tr_population_by_event_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/3dc8e840-08a1-4fe0-8e02-257f176f3db3/resourceGroups/covid-proj-rg/providers/Microsoft.Storage/storageAccounts/covidblobsa"
@@ -65,6 +69,9 @@
 					},
 					"ls_covid_target_adls_properties_typeProperties_url": {
 						"value": "[parameters('ls_covid_target_adls_properties_typeProperties_url')]"
+					},
+					"ls_http_ecdc_properties_typeProperties_url": {
+						"value": "[parameters('ls_http_ecdc_properties_typeProperties_url')]"
 					},
 					"tr_population_by_event_properties_typeProperties_scope": {
 						"value": "[parameters('tr_population_by_event_properties_typeProperties_scope')]"
