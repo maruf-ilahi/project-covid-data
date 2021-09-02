@@ -2,7 +2,7 @@
 	"name": "tr_population_tumbling",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipeline": {
 			"pipelineReference": {
 				"referenceName": "pl_inquest_pop_data_test",
