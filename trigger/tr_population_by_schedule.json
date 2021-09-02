@@ -16,8 +16,8 @@
 			"recurrence": {
 				"frequency": "Minute",
 				"interval": 1,
-				"startTime": "2021-09-05T10:18:00Z",
-				"timeZone": "UTC"
+				"startTime": "2021-09-05T10:18:00",
+				"timeZone": "GMT Standard Time"
 			}
 		}
 	}
