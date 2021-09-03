@@ -21,7 +21,7 @@
 			"recurrence": {
 				"frequency": "Hour",
 				"interval": 24,
-				"startTime": "2021-09-03T11:33:00",
+				"startTime": "2021-09-03T11:30:00",
 				"timeZone": "GMT Standard Time"
 			}
 		}
