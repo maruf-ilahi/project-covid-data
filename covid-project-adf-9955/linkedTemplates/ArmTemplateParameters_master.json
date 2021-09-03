@@ -29,6 +29,15 @@
 		"tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
 			"value": "https://opendata.ecdc.europa.eu"
 		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
+			"value": "/sites/default/files/documents/response_graphs_data_2021-08-26.csv"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName": {
+			"value": "country_response.csv"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
+			"value": "https://www.ecdc.europa.eu"
+		},
 		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
 			"value": "covid19/hospitalicuadmissionrates/csv/data.csv"
 		},
@@ -49,15 +58,6 @@
 		},
 		"tr_testing_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
 			"value": "https://opendata.ecdc.europa.eu"
-		},
-		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
-			"value": "/sites/default/files/documents/response_graphs_data_2021-08-26.csv"
-		},
-		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName": {
-			"value": "country_response.csv"
-		},
-		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
-			"value": "https://www.ecdc.europa.eu"
 		},
 		"containerUri": {
 			"value": ""

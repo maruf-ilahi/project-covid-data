@@ -39,6 +39,18 @@
 			"type": "string",
 			"defaultValue": "https://opendata.ecdc.europa.eu"
 		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
+			"type": "string",
+			"defaultValue": "/sites/default/files/documents/response_graphs_data_2021-08-26.csv"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName": {
+			"type": "string",
+			"defaultValue": "country_response.csv"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://www.ecdc.europa.eu"
+		},
 		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
 			"type": "string",
 			"defaultValue": "covid19/hospitalicuadmissionrates/csv/data.csv"
@@ -66,18 +78,6 @@
 		"tr_testing_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://opendata.ecdc.europa.eu"
-		},
-		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
-			"type": "string",
-			"defaultValue": "/sites/default/files/documents/response_graphs_data_2021-08-26.csv"
-		},
-		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName": {
-			"type": "string",
-			"defaultValue": "country_response.csv"
-		},
-		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://www.ecdc.europa.eu"
 		}
 	},
 	"variables": {
@@ -93,7 +93,14 @@
 					{
 						"name": "Cases And Deaths Data",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "7.00:00:00",
 							"retry": 0,
@@ -154,6 +161,38 @@
 								}
 							}
 						]
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "ds_ecdc_file_list",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
 					}
 				],
 				"parameters": {
@@ -171,7 +210,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_http')]",
-				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_dl')]"
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_dl')]",
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_file_list')]"
 			]
 		},
 		{
@@ -722,6 +762,43 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_ecdc_file_list')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_covid_source_blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "ecdc_file_list.json",
+						"container": "data"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"sourceBaseURL": {
+							"type": "string"
+						},
+						"sourceRelativeURL": {
+							"type": "string"
+						},
+						"sinkFileName": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_covid_source_blob')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_ecdc_raw_csv_dl')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -945,6 +1022,40 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/tr_country_response')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingest_ecdc_data",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"relativeUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
+							"fileName": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName')]",
+							"baseUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 24,
+						"startTime": "2021-09-03T11:30:00",
+						"timeZone": "GMT Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingest_ecdc_data')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/tr_hospital_adm')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -1096,40 +1207,6 @@
 						"frequency": "Hour",
 						"interval": 24,
 						"startTime": "2021-09-03T10:30:00",
-						"timeZone": "GMT Standard Time"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_ingest_ecdc_data')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/tr_country_response')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "pl_ingest_ecdc_data",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"relativeUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
-							"fileName": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName')]",
-							"baseUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Hour",
-						"interval": 24,
-						"startTime": "2021-09-03T11:30:00",
 						"timeZone": "GMT Standard Time"
 					}
 				}
