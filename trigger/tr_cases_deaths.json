@@ -11,7 +11,8 @@
 				},
 				"parameters": {
 					"relativeUrl": "covid19/nationalcasedeath/csv/data.csv",
-					"fileName": "cases_deaths.csv"
+					"fileName": "cases_deaths.csv",
+					"baseUrl": "https://www.ecdc.europa.eu"
 				}
 			}
 		],

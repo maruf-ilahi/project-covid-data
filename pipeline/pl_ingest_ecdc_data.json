@@ -43,8 +43,12 @@
 						"referenceName": "ds_ecdc_raw_csv_http",
 						"type": "DatasetReference",
 						"parameters": {
-							"url": {
+							"relativeUrl": {
 								"value": "@pipeline().parameters.relativeUrl",
+								"type": "Expression"
+							},
+							"baseUrl": {
+								"value": "@pipeline().parameters.baseUrl",
 								"type": "Expression"
 							}
 						}
