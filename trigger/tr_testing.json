@@ -11,7 +11,8 @@
 				},
 				"parameters": {
 					"relativeUrl": "covid19/testing/csv/data.csv",
-					"fileName": "testing.csv"
+					"fileName": "testing.csv",
+					"baseUrl": "https://opendata.ecdc.europa.eu"
 				}
 			}
 		],
