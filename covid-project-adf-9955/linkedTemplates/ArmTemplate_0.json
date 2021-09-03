@@ -160,7 +160,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_cases_deaths_raw_csv_dl')]",
+			"name": "[concat(parameters('factoryName'), '/ds_ecdc_raw_csv_dl')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -168,12 +168,20 @@
 					"referenceName": "ls_covid_target_adls",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "cases_death.csv",
+						"fileName": {
+							"value": "@dataset().fileName",
+							"type": "Expression"
+						},
 						"folderPath": "ecdc",
 						"fileSystem": "raw"
 					},
@@ -272,7 +280,13 @@
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Set variable1",
+								"activity": "Set URL",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set File Name",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -324,25 +338,43 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "ds_cases_deaths_raw_csv_dl",
+								"referenceName": "ds_ecdc_raw_csv_dl",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"fileName": {
+										"value": "@variables('fileName')",
+										"type": "Expression"
+									}
+								}
 							}
 						]
 					},
 					{
-						"name": "Set variable1",
+						"name": "Set URL",
 						"type": "SetVariable",
 						"dependsOn": [],
 						"userProperties": [],
 						"typeProperties": {
 							"variableName": "relativeUrl",
-							"value": "covid19/nationalcasedeath/csv/data.csv "
+							"value": "covid19/testing/csv/data.csv"
+						}
+					},
+					{
+						"name": "Set File Name",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "fileName",
+							"value": "testing.csv "
 						}
 					}
 				],
 				"variables": {
 					"relativeUrl": {
+						"type": "String"
+					},
+					"fileName": {
 						"type": "String"
 					}
 				},
@@ -350,7 +382,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_http')]",
-				"[concat(variables('factoryId'), '/datasets/ds_cases_deaths_raw_csv_dl')]"
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_dl')]"
 			]
 		},
 		{
