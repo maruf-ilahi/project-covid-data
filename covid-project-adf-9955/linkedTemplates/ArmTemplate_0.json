@@ -189,7 +189,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_cases_deaths_raw_csv_http')]",
+			"name": "[concat(parameters('factoryName'), '/ds_ecdc_raw_csv_http')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -197,12 +197,20 @@
 					"referenceName": "ls_http_ecdc",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"url": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "HttpServerLocation",
-						"relativeUrl": "covid19/nationalcasedeath/csv/data.csv "
+						"relativeUrl": {
+							"value": "@dataset().url",
+							"type": "Expression"
+						}
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
@@ -262,7 +270,14 @@
 					{
 						"name": "Cases And Deaths Data",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Set variable1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "7.00:00:00",
 							"retry": 0,
@@ -297,9 +312,14 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "ds_cases_deaths_raw_csv_http",
+								"referenceName": "ds_ecdc_raw_csv_http",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"url": {
+										"value": "@variables('relativeUrl')",
+										"type": "Expression"
+									}
+								}
 							}
 						],
 						"outputs": [
@@ -309,12 +329,27 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "relativeUrl",
+							"value": "covid19/nationalcasedeath/csv/data.csv "
+						}
 					}
 				],
+				"variables": {
+					"relativeUrl": {
+						"type": "String"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_cases_deaths_raw_csv_http')]",
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_http')]",
 				"[concat(variables('factoryId'), '/datasets/ds_cases_deaths_raw_csv_dl')]"
 			]
 		},
