@@ -11,7 +11,8 @@
 				},
 				"parameters": {
 					"relativeUrl": "covid19/hospitalicuadmissionrates/csv/data.csv",
-					"fileName": "hospital_admission.csv"
+					"fileName": "hospital_admission.csv",
+					"baseUrl": "https://www.ecdc.europa.eu"
 				}
 			}
 		],
