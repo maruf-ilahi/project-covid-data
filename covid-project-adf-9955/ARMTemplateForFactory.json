@@ -25,11 +25,7 @@
 		},
 		"ls_http_ecdc_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://opendata.ecdc.europa.eu"
-		},
-		"tr_population_by_event_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/3dc8e840-08a1-4fe0-8e02-257f176f3db3/resourceGroups/covid-proj-rg/providers/Microsoft.Storage/storageAccounts/covidblobsa"
+			"defaultValue": "@{linkedService().baseUrl}"
 		},
 		"tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
 			"type": "string",
@@ -39,6 +35,10 @@
 			"type": "string",
 			"defaultValue": "cases_deaths.csv"
 		},
+		"tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://opendata.ecdc.europa.eu"
+		},
 		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
 			"type": "string",
 			"defaultValue": "covid19/hospitalicuadmissionrates/csv/data.csv"
@@ -47,6 +47,14 @@
 			"type": "string",
 			"defaultValue": "hospital_admission.csv"
 		},
+		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://opendata.ecdc.europa.eu"
+		},
+		"tr_population_by_event_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/3dc8e840-08a1-4fe0-8e02-257f176f3db3/resourceGroups/covid-proj-rg/providers/Microsoft.Storage/storageAccounts/covidblobsa"
+		},
 		"tr_testing_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
 			"type": "string",
 			"defaultValue": "covid19/testing/csv/data.csv"
@@ -54,6 +62,22 @@
 		"tr_testing_properties_pl_ingest_ecdc_data_parameters_fileName": {
 			"type": "string",
 			"defaultValue": "testing.csv"
+		},
+		"tr_testing_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://opendata.ecdc.europa.eu"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
+			"type": "string",
+			"defaultValue": "/sites/default/files/documents/response_graphs_data_2021-08-26.csv"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName": {
+			"type": "string",
+			"defaultValue": "country_response.csv"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://www.ecdc.europa.eu"
 		}
 	},
 	"variables": {
@@ -107,8 +131,12 @@
 								"referenceName": "ds_ecdc_raw_csv_http",
 								"type": "DatasetReference",
 								"parameters": {
-									"url": {
+									"relativeUrl": {
 										"value": "@pipeline().parameters.relativeUrl",
+										"type": "Expression"
+									},
+									"baseUrl": {
+										"value": "@pipeline().parameters.baseUrl",
 										"type": "Expression"
 									}
 								}
@@ -133,6 +161,9 @@
 						"type": "string"
 					},
 					"fileName": {
+						"type": "string"
+					},
+					"baseUrl": {
 						"type": "string"
 					}
 				},
@@ -734,10 +765,19 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "ls_http_ecdc",
-					"type": "LinkedServiceReference"
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"baseUrl": {
+							"value": "@dataset().baseUrl",
+							"type": "Expression"
+						}
+					}
 				},
 				"parameters": {
-					"url": {
+					"relativeUrl": {
+						"type": "string"
+					},
+					"baseUrl": {
 						"type": "string"
 					}
 				},
@@ -747,7 +787,7 @@
 					"location": {
 						"type": "HttpServerLocation",
 						"relativeUrl": {
-							"value": "@dataset().url",
+							"value": "@dataset().relativeUrl",
 							"type": "Expression"
 						}
 					},
@@ -855,6 +895,11 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"parameters": {
+					"baseUrl": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "HttpServer",
 				"typeProperties": {
@@ -864,6 +909,74 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tr_cases_deaths')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingest_ecdc_data",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"relativeUrl": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
+							"fileName": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_fileName')]",
+							"baseUrl": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 24,
+						"startTime": "2021-09-03T10:30:00",
+						"timeZone": "GMT Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingest_ecdc_data')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tr_hospital_adm')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingest_ecdc_data",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"relativeUrl": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
+							"fileName": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_fileName')]",
+							"baseUrl": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 24,
+						"startTime": "2021-09-03T10:30:00",
+						"timeZone": "GMT Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingest_ecdc_data')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/tr_population_by_event')]",
@@ -958,72 +1071,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/tr_cases_deaths')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "pl_ingest_ecdc_data",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"relativeUrl": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
-							"fileName": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_fileName')]"
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Hour",
-						"interval": 24,
-						"startTime": "2021-09-03T10:30:00",
-						"timeZone": "GMT Standard Time"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_ingest_ecdc_data')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/tr_hospital_adm')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "pl_ingest_ecdc_data",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"relativeUrl": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
-							"fileName": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_fileName')]"
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Hour",
-						"interval": 24,
-						"startTime": "2021-09-03T10:30:00",
-						"timeZone": "GMT Standard Time"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_ingest_ecdc_data')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/tr_testing')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -1038,7 +1085,8 @@
 						},
 						"parameters": {
 							"relativeUrl": "[parameters('tr_testing_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
-							"fileName": "[parameters('tr_testing_properties_pl_ingest_ecdc_data_parameters_fileName')]"
+							"fileName": "[parameters('tr_testing_properties_pl_ingest_ecdc_data_parameters_fileName')]",
+							"baseUrl": "[parameters('tr_testing_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
 						}
 					}
 				],
@@ -1048,6 +1096,40 @@
 						"frequency": "Hour",
 						"interval": 24,
 						"startTime": "2021-09-03T10:30:00",
+						"timeZone": "GMT Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingest_ecdc_data')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tr_country_response')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingest_ecdc_data",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"relativeUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
+							"fileName": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName')]",
+							"baseUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 24,
+						"startTime": "2021-09-03T11:33:00",
 						"timeZone": "GMT Standard Time"
 					}
 				}
