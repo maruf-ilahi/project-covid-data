@@ -7,7 +7,13 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Set variable1",
+						"activity": "Set URL",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set File Name",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -59,24 +65,43 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_cases_deaths_raw_csv_dl",
-						"type": "DatasetReference"
+						"referenceName": "ds_ecdc_raw_csv_dl",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": {
+								"value": "@variables('fileName')",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			},
 			{
-				"name": "Set variable1",
+				"name": "Set URL",
 				"type": "SetVariable",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "relativeUrl",
-					"value": "covid19/nationalcasedeath/csv/data.csv "
+					"value": "covid19/testing/csv/data.csv"
+				}
+			},
+			{
+				"name": "Set File Name",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "fileName",
+					"value": "testing.csv "
 				}
 			}
 		],
 		"variables": {
 			"relativeUrl": {
+				"type": "String"
+			},
+			"fileName": {
 				"type": "String"
 			}
 		},
