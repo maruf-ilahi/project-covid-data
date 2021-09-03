@@ -1,24 +1,11 @@
 {
-	"name": "pl_ingest_cases_deaths_data",
+	"name": "pl_ingest_ecdc_data",
 	"properties": {
 		"activities": [
 			{
 				"name": "Cases And Deaths Data",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Set URL",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Set File Name",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -57,7 +44,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"url": {
-								"value": "@variables('relativeUrl')",
+								"value": "@pipeline().parameters.relativeUrl",
 								"type": "Expression"
 							}
 						}
@@ -69,40 +56,20 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"fileName": {
-								"value": "@variables('fileName')",
+								"value": "@pipeline().parameters.fileName",
 								"type": "Expression"
 							}
 						}
 					}
 				]
-			},
-			{
-				"name": "Set URL",
-				"type": "SetVariable",
-				"dependsOn": [],
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "relativeUrl",
-					"value": "covid19/testing/csv/data.csv"
-				}
-			},
-			{
-				"name": "Set File Name",
-				"type": "SetVariable",
-				"dependsOn": [],
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "fileName",
-					"value": "testing.csv "
-				}
 			}
 		],
-		"variables": {
+		"parameters": {
 			"relativeUrl": {
-				"type": "String"
+				"type": "string"
 			},
 			"fileName": {
-				"type": "String"
+				"type": "string"
 			}
 		},
 		"annotations": []
