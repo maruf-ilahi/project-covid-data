@@ -27,57 +27,9 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().baseUrl}"
 		},
-		"tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
-			"type": "string",
-			"defaultValue": "covid19/nationalcasedeath/csv/data.csv"
-		},
-		"tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_fileName": {
-			"type": "string",
-			"defaultValue": "cases_deaths.csv"
-		},
-		"tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://opendata.ecdc.europa.eu"
-		},
-		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
-			"type": "string",
-			"defaultValue": "/sites/default/files/documents/response_graphs_data_2021-08-26.csv"
-		},
-		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName": {
-			"type": "string",
-			"defaultValue": "country_response.csv"
-		},
-		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://www.ecdc.europa.eu"
-		},
-		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
-			"type": "string",
-			"defaultValue": "covid19/hospitalicuadmissionrates/csv/data.csv"
-		},
-		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_fileName": {
-			"type": "string",
-			"defaultValue": "hospital_admission.csv"
-		},
-		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://opendata.ecdc.europa.eu"
-		},
 		"tr_population_by_event_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/3dc8e840-08a1-4fe0-8e02-257f176f3db3/resourceGroups/covid-proj-rg/providers/Microsoft.Storage/storageAccounts/covidblobsa"
-		},
-		"tr_testing_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
-			"type": "string",
-			"defaultValue": "covid19/testing/csv/data.csv"
-		},
-		"tr_testing_properties_pl_ingest_ecdc_data_parameters_fileName": {
-			"type": "string",
-			"defaultValue": "testing.csv"
-		},
-		"tr_testing_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://opendata.ecdc.europa.eu"
 		}
 	},
 	"variables": {
@@ -91,79 +43,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Cases And Deaths Data",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "GET"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_ecdc_raw_csv_http",
-								"type": "DatasetReference",
-								"parameters": {
-									"relativeUrl": {
-										"value": "@pipeline().parameters.relativeUrl",
-										"type": "Expression"
-									},
-									"baseUrl": {
-										"value": "@pipeline().parameters.baseUrl",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_ecdc_raw_csv_dl",
-								"type": "DatasetReference",
-								"parameters": {
-									"fileName": {
-										"value": "@pipeline().parameters.fileName",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					},
-					{
-						"name": "Lookup1",
+						"name": "Lookup File List",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -179,7 +59,7 @@
 								"type": "JsonSource",
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
+									"recursive": false,
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
@@ -193,25 +73,112 @@
 							},
 							"firstRowOnly": false
 						}
+					},
+					{
+						"name": "Loop for each file",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup File List",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup File List').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Cases And Deaths Data",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "HttpReadSettings",
+												"requestMethod": "GET"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_ecdc_raw_csv_http",
+											"type": "DatasetReference",
+											"parameters": {
+												"relativeUrl": {
+													"value": "@pipeline().parameters.relativeUrl",
+													"type": "Expression"
+												},
+												"baseUrl": {
+													"value": "@pipeline().parameters.baseUrl",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_ecdc_raw_csv_dl",
+											"type": "DatasetReference",
+											"parameters": {
+												"fileName": {
+													"value": "@pipeline().parameters.fileName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
 					}
 				],
 				"parameters": {
 					"relativeUrl": {
 						"type": "string"
 					},
-					"fileName": {
+					"baseUrl": {
 						"type": "string"
 					},
-					"baseUrl": {
+					"fileName": {
 						"type": "string"
 					}
 				},
 				"annotations": []
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_file_list')]",
 				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_http')]",
-				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_dl')]",
-				"[concat(variables('factoryId'), '/datasets/ds_ecdc_file_list')]"
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_dl')]"
 			]
 		},
 		{
@@ -779,20 +746,7 @@
 						"container": "data"
 					}
 				},
-				"schema": {
-					"type": "object",
-					"properties": {
-						"sourceBaseURL": {
-							"type": "string"
-						},
-						"sourceRelativeURL": {
-							"type": "string"
-						},
-						"sinkFileName": {
-							"type": "string"
-						}
-					}
-				}
+				"schema": {}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_covid_source_blob')]"
@@ -1000,11 +954,7 @@
 							"referenceName": "pl_ingest_ecdc_data",
 							"type": "PipelineReference"
 						},
-						"parameters": {
-							"relativeUrl": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
-							"fileName": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_fileName')]",
-							"baseUrl": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
-						}
+						"parameters": {}
 					}
 				],
 				"type": "ScheduleTrigger",
@@ -1034,11 +984,7 @@
 							"referenceName": "pl_ingest_ecdc_data",
 							"type": "PipelineReference"
 						},
-						"parameters": {
-							"relativeUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
-							"fileName": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName')]",
-							"baseUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
-						}
+						"parameters": {}
 					}
 				],
 				"type": "ScheduleTrigger",
@@ -1068,11 +1014,7 @@
 							"referenceName": "pl_ingest_ecdc_data",
 							"type": "PipelineReference"
 						},
-						"parameters": {
-							"relativeUrl": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
-							"fileName": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_fileName')]",
-							"baseUrl": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
-						}
+						"parameters": {}
 					}
 				],
 				"type": "ScheduleTrigger",
@@ -1194,11 +1136,7 @@
 							"referenceName": "pl_ingest_ecdc_data",
 							"type": "PipelineReference"
 						},
-						"parameters": {
-							"relativeUrl": "[parameters('tr_testing_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
-							"fileName": "[parameters('tr_testing_properties_pl_ingest_ecdc_data_parameters_fileName')]",
-							"baseUrl": "[parameters('tr_testing_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
-						}
+						"parameters": {}
 					}
 				],
 				"type": "ScheduleTrigger",
