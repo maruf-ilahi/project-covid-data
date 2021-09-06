@@ -1,5 +1,6 @@
 {
 	"name": "ls_http_ecdc",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
 			"baseUrl": {
