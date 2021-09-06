@@ -3,79 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Cases And Deaths Data",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Lookup1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "HttpReadSettings",
-							"requestMethod": "GET"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
-						}
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "ds_ecdc_raw_csv_http",
-						"type": "DatasetReference",
-						"parameters": {
-							"relativeUrl": {
-								"value": "@pipeline().parameters.relativeUrl",
-								"type": "Expression"
-							},
-							"baseUrl": {
-								"value": "@pipeline().parameters.baseUrl",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ds_ecdc_raw_csv_dl",
-						"type": "DatasetReference",
-						"parameters": {
-							"fileName": {
-								"value": "@pipeline().parameters.fileName",
-								"type": "Expression"
-							}
-						}
-					}
-				]
-			},
-			{
-				"name": "Lookup1",
+				"name": "Lookup File List",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -91,7 +19,7 @@
 						"type": "JsonSource",
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
+							"recursive": false,
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -102,7 +30,94 @@
 						"referenceName": "ds_ecdc_file_list",
 						"type": "DatasetReference"
 					},
-					"firstRowOnly": false
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "Loop for each file",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup File List",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup File List').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Cases And Deaths Data",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_ecdc_raw_csv_http",
+									"type": "DatasetReference",
+									"parameters": {
+										"relativeUrl": {
+											"value": "@pipeline().parameters.relativeUrl",
+											"type": "Expression"
+										},
+										"baseUrl": {
+											"value": "@pipeline().parameters.baseUrl",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_ecdc_raw_csv_dl",
+									"type": "DatasetReference",
+									"parameters": {
+										"fileName": {
+											"value": "@pipeline().parameters.fileName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
 				}
 			}
 		],
@@ -110,10 +125,10 @@
 			"relativeUrl": {
 				"type": "string"
 			},
-			"fileName": {
+			"baseUrl": {
 				"type": "string"
 			},
-			"baseUrl": {
+			"fileName": {
 				"type": "string"
 			}
 		},
