@@ -27,6 +27,42 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().baseUrl}"
 		},
+		"tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
+			"type": "string",
+			"defaultValue": "covid19/nationalcasedeath/csv/data.csv"
+		},
+		"tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_fileName": {
+			"type": "string",
+			"defaultValue": "cases_deaths.csv"
+		},
+		"tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://opendata.ecdc.europa.eu"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
+			"type": "string",
+			"defaultValue": "/sites/default/files/documents/response_graphs_data_2021-08-26.csv"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName": {
+			"type": "string",
+			"defaultValue": "country_response.csv"
+		},
+		"tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://www.ecdc.europa.eu"
+		},
+		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_relativeUrl": {
+			"type": "string",
+			"defaultValue": "covid19/hospitalicuadmissionrates/csv/data.csv"
+		},
+		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_fileName": {
+			"type": "string",
+			"defaultValue": "hospital_admission.csv"
+		},
+		"tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://opendata.ecdc.europa.eu"
+		},
 		"tr_population_by_event_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/3dc8e840-08a1-4fe0-8e02-257f176f3db3/resourceGroups/covid-proj-rg/providers/Microsoft.Storage/storageAccounts/covidblobsa"
@@ -207,10 +243,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@dataset().fileName",
-							"type": "Expression"
-						},
+						"fileName": "cases_deaths.csv",
 						"folderPath": "ecdc",
 						"fileSystem": "raw"
 					},
@@ -219,7 +252,48 @@
 					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "country",
+						"type": "String"
+					},
+					{
+						"name": "country_code",
+						"type": "String"
+					},
+					{
+						"name": "continent",
+						"type": "String"
+					},
+					{
+						"name": "population",
+						"type": "String"
+					},
+					{
+						"name": "indicator",
+						"type": "String"
+					},
+					{
+						"name": "weekly_count",
+						"type": "String"
+					},
+					{
+						"name": "year_week",
+						"type": "String"
+					},
+					{
+						"name": "rate_14_day",
+						"type": "String"
+					},
+					{
+						"name": "cumulative_count",
+						"type": "String"
+					},
+					{
+						"name": "source",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_covid_target_adls')]"
@@ -267,6 +341,32 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_http_ecdc')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ecdc_transformed_data')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_covid_target_adls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "sink"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_covid_target_adls')]"
 			]
 		},
 		{
@@ -942,6 +1042,50 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/df_transform_cases_dealths')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ecdc_raw_csv_dl",
+								"type": "DatasetReference"
+							},
+							"name": "casesDeaths"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_ecdc_transformed_data",
+								"type": "DatasetReference"
+							},
+							"name": "tempSink"
+						}
+					],
+					"transformations": [
+						{
+							"name": "filterEuropeData"
+						},
+						{
+							"name": "selectRequiredColumns"
+						},
+						{
+							"name": "pivotEuropeData"
+						}
+					],
+					"script": "source(output(\n\t\tcountry as string,\n\t\tcountry_code as string,\n\t\tcontinent as string,\n\t\tpopulation as integer,\n\t\tindicator as string,\n\t\tweekly_count as integer,\n\t\tyear_week as string,\n\t\trate_14_day as double,\n\t\tcumulative_count as integer,\n\t\tsource as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100,\n\tignoreNoFilesFound: false,\n\twildcardPaths:['ecdc/cases_deaths.csv']) ~> casesDeaths\ncasesDeaths filter(continent==\"Europe\") ~> filterEuropeData\nfilterEuropeData select(mapColumn(\n\t\tcountry_code,\n\t\tcountry,\n\t\tpopulation,\n\t\tindicator,\n\t\tweekly_count,\n\t\tyear_week,\n\t\tcumulative_count,\n\t\tsource,\n\t\teach(match(type==\"string\"),\n\t\t\t$$+\"_string\" = $$)\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> selectRequiredColumns\nselectRequiredColumns pivot(groupBy(country,\n\t\tcountry_code,\n\t\tyear_week,\n\t\tsource),\n\tpivotBy(indicator, ['cases', 'deaths']),\n\tCount = sum(weekly_count),\n\tcolumnNaming: '$N$V',\n\tlateral: true) ~> pivotEuropeData\npivotEuropeData sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> tempSink"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_raw_csv_dl')]",
+				"[concat(variables('factoryId'), '/datasets/ds_ecdc_transformed_data')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/tr_cases_deaths')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -954,7 +1098,11 @@
 							"referenceName": "pl_ingest_ecdc_data",
 							"type": "PipelineReference"
 						},
-						"parameters": {}
+						"parameters": {
+							"relativeUrl": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
+							"fileName": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_fileName')]",
+							"baseUrl": "[parameters('tr_cases_deaths_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
+						}
 					}
 				],
 				"type": "ScheduleTrigger",
@@ -984,7 +1132,11 @@
 							"referenceName": "pl_ingest_ecdc_data",
 							"type": "PipelineReference"
 						},
-						"parameters": {}
+						"parameters": {
+							"relativeUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
+							"fileName": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_fileName')]",
+							"baseUrl": "[parameters('tr_country_response_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
+						}
 					}
 				],
 				"type": "ScheduleTrigger",
@@ -1014,7 +1166,11 @@
 							"referenceName": "pl_ingest_ecdc_data",
 							"type": "PipelineReference"
 						},
-						"parameters": {}
+						"parameters": {
+							"relativeUrl": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_relativeUrl')]",
+							"fileName": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_fileName')]",
+							"baseUrl": "[parameters('tr_hospital_adm_properties_pl_ingest_ecdc_data_parameters_baseUrl')]"
+						}
 					}
 				],
 				"type": "ScheduleTrigger",
@@ -1090,67 +1246,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pl_inquest_pop_data_test')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/tr_population_tumbling')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipeline": {
-					"pipelineReference": {
-						"referenceName": "pl_inquest_pop_data_test",
-						"type": "PipelineReference"
-					},
-					"parameters": {}
-				},
-				"type": "TumblingWindowTrigger",
-				"typeProperties": {
-					"frequency": "Minute",
-					"interval": 5,
-					"startTime": "2021-09-02T10:53:00Z",
-					"delay": "00:00:00",
-					"maxConcurrency": 50,
-					"retryPolicy": {
-						"intervalInSeconds": 30
-					},
-					"dependsOn": []
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_inquest_pop_data_test')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/tr_testing')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "pl_ingest_ecdc_data",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Hour",
-						"interval": 24,
-						"startTime": "2021-09-03T10:30:00",
-						"timeZone": "GMT Standard Time"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_ingest_ecdc_data')]"
 			]
 		}
 	]
