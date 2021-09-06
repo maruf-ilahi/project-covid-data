@@ -1,0 +1,20 @@
+{
+	"name": "df_transform_cases_dealths",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ecdc_raw_csv_dl",
+						"type": "DatasetReference"
+					},
+					"name": "casesDeaths"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tlimit: 100,\n\tignoreNoFilesFound: false) ~> casesDeaths"
+		}
+	}
+}
