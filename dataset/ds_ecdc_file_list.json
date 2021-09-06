@@ -14,19 +14,6 @@
 				"container": "data"
 			}
 		},
-		"schema": {
-			"type": "object",
-			"properties": {
-				"sourceBaseURL": {
-					"type": "string"
-				},
-				"sourceRelativeURL": {
-					"type": "string"
-				},
-				"sinkFileName": {
-					"type": "string"
-				}
-			}
-		}
+		"schema": {}
 	}
 }
