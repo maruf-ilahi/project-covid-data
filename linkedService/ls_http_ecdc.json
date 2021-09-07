@@ -4,6 +4,12 @@
 		"parameters": {
 			"BaseURL": {
 				"type": "string"
+			},
+			"RelativeURL": {
+				"type": "string"
+			},
+			"FileName": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
