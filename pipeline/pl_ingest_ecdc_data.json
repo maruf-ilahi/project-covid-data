@@ -94,11 +94,11 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"relativeUrl": {
-											"value": "@pipeline().parameters.relativeUrl",
+											"value": "@pipeline().parameters.RelativeUrl",
 											"type": "Expression"
 										},
 										"baseUrl": {
-											"value": "@pipeline().parameters.baseUrl",
+											"value": "@pipeline().parameters.BaseUrl",
 											"type": "Expression"
 										}
 									}
@@ -110,7 +110,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"fileName": {
-											"value": "@pipeline().parameters.fileName",
+											"value": "@pipeline().parameters.FileName",
 											"type": "Expression"
 										}
 									}
@@ -122,13 +122,13 @@
 			}
 		],
 		"parameters": {
-			"relativeUrl": {
+			"BaseUrl": {
 				"type": "string"
 			},
-			"baseUrl": {
+			"RelativeUrl": {
 				"type": "string"
 			},
-			"fileName": {
+			"FileName": {
 				"type": "string"
 			}
 		},
