@@ -47,7 +47,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup File List').output.value",
+						"value": "@activity('Lookup File List').output",
 						"type": "Expression"
 					},
 					"isSequential": true,
@@ -94,11 +94,11 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"relativeUrl": {
-											"value": "@pipeline().parameters.RelativeUrl",
+											"value": "@pipeline().parameters.RelativeURL",
 											"type": "Expression"
 										},
 										"baseUrl": {
-											"value": "@pipeline().parameters.BaseUrl",
+											"value": "@pipeline().parameters.BaseURL",
 											"type": "Expression"
 										}
 									}
@@ -122,10 +122,10 @@
 			}
 		],
 		"parameters": {
-			"BaseUrl": {
+			"BaseURL": {
 				"type": "string"
 			},
-			"RelativeUrl": {
+			"RelativeURL": {
 				"type": "string"
 			},
 			"FileName": {
