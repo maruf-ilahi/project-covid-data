@@ -1,9 +1,8 @@
 {
 	"name": "ls_http_ecdc",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
-			"baseUrl": {
+			"BaseURL": {
 				"type": "string"
 			}
 		},
@@ -14,5 +13,6 @@
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
