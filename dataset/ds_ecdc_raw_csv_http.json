@@ -3,31 +3,13 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_http_ecdc",
-			"type": "LinkedServiceReference",
-			"parameters": {
-				"baseUrl": {
-					"value": "@dataset().BaseURL",
-					"type": "Expression"
-				}
-			}
-		},
-		"parameters": {
-			"RelativeURL": {
-				"type": "string"
-			},
-			"BaseURL": {
-				"type": "string"
-			}
+			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "HttpServerLocation",
-				"relativeUrl": {
-					"value": "@dataset().RelativeURL",
-					"type": "Expression"
-				}
+				"type": "HttpServerLocation"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
