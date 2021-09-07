@@ -30,7 +30,7 @@
 						"referenceName": "ds_ecdc_file_list",
 						"type": "DatasetReference"
 					},
-					"firstRowOnly": false
+					"firstRowOnly": true
 				}
 			},
 			{
@@ -47,7 +47,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup File List').output",
+						"value": "@activity('Lookup File List').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
@@ -91,29 +91,13 @@
 							"inputs": [
 								{
 									"referenceName": "ds_ecdc_raw_csv_http",
-									"type": "DatasetReference",
-									"parameters": {
-										"relativeUrl": {
-											"value": "@pipeline().parameters.RelativeURL",
-											"type": "Expression"
-										},
-										"baseUrl": {
-											"value": "@pipeline().parameters.BaseURL",
-											"type": "Expression"
-										}
-									}
+									"type": "DatasetReference"
 								}
 							],
 							"outputs": [
 								{
 									"referenceName": "ds_ecdc_raw_csv_dl",
-									"type": "DatasetReference",
-									"parameters": {
-										"fileName": {
-											"value": "@pipeline().parameters.FileName",
-											"type": "Expression"
-										}
-									}
+									"type": "DatasetReference"
 								}
 							]
 						}
