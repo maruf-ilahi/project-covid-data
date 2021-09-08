@@ -2,15 +2,15 @@
 	"name": "ls_http_ecdc",
 	"properties": {
 		"parameters": {
-			"BaseURL": {
+			"baseUrl": {
 				"type": "string"
 			}
 		},
 		"annotations": [],
 		"type": "HttpServer",
 		"typeProperties": {
-			"url": "@{linkedService().BaseURL}",
-			"enableServerCertificateValidation": true,
+			"url": "@{linkedService().baseUrl}",
+			"enableServerCertificateValidation": false,
 			"authenticationType": "Anonymous"
 		}
 	},
