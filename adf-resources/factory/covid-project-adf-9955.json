@@ -1,0 +1,9 @@
+{
+	"name": "covid-project-adf-9955",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "25f6a158-c869-4156-a807-d1845c22ea02",
+		"tenantId": "d59a3161-ab21-4345-903a-6e106ecbcc92"
+	}
+}

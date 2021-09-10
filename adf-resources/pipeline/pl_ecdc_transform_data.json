@@ -1,0 +1,39 @@
+{
+	"name": "pl_ecdc_transform_data",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_transform_cases_dealths",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_transform_cases_dealths",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"casesDeaths": {
+								"fileName": "a"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-09-08T10:05:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
